@@ -1,10 +1,9 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { reducer, initialState } from "../logic/state";
+import { isThereAnyLegalMoves } from "../logic/checks";
+import { makeAiPlay } from "../logic/ai";
 import Board from "./Board";
 
-//. PAWS DEFINITION .
-const WhitePawn = () => <div className="wP"></div>;
-const BlackPawn = () => <div className="bP"></div>;
 //. Component .
 const Game = () => {
   //* STATE DEFINITION .
@@ -14,46 +13,57 @@ const Game = () => {
   );
   //* OBSERVING STATE .
   useEffect(() => {
-    if (state.isPlaying === true && state.whosTurn === "black") {
-      document.querySelector(".boardContainer")?.classList.add("active");
-    }
-    if (state.isPlaying === false || state.whosTurn === "white") {
-      document.querySelector(".boardContainer")?.classList.remove("active");
+    /* Is there any legal moves ? 
+        If so, 
+          if it's the player turn, activate the board and let him make a move
+          if not, deactivate the board and make the AI play
+        If not, dispatch the gameover action
+    */
+    if (state.isGameOver) return;
+    if (isThereAnyLegalMoves(state.board, state.whosTurn)) {
+      if (state.isPlaying && state.whosTurn === 2) {
+        document.querySelector(".boardContainer")?.classList.add("active");
+      } else {
+        document.querySelector(".boardContainer")?.classList.remove("active");
+        makeAiPlay();
+      }
+    } else {
+      dispatch({ type: "gameOver" });
     }
   }, [state]);
-  //* BUTTONS HANDLERS .
-  const handleGameOver = () => {
-    dispatch({ type: "gameOver" });
-  };
-  const handleRestart = () => {
-    dispatch({ type: "restart" });
-  };
-  const handleStart = () => {
-    dispatch({ type: "start" });
-  };
   //* RETURN STATEMENT .
   return (
     <div>
+      {/* CONTROLS */}
+      <div className="boardControls">
+        <button type="button" onClick={() => dispatch({ type: "start" })}>
+          {state.isPlaying ? "Pause Game" : "Start Game"}
+        </button>
+        {state.isPlaying ? (
+          <button type="button" onClick={() => dispatch({ type: "restart" })}>
+            {"Restart Game"}
+          </button>
+        ) : null}
+      </div>
       {/* ACTUAL BOARD */}
-      <Board board={state.board} canPlay={state.canPlay()} />
+      <Board
+        board={state.board}
+        canPlay={state.isPlaying && state.whosTurn === 2}
+        state={state}
+        dispatch={dispatch}
+      />
       <div className="stateDisplay">
         {/* STATE DISPLAY */}
         <h3>State: </h3>
         <div>
-          isPlaying : {state.isPlaying.toString()}{" "}
-          <button type="button" onClick={handleStart}>
-            Start Game | Pause Game
-          </button>
-        </div>
-        <div>
           IsGameOver : {state.isGameOver.toString()}{" "}
-          <button type="button" onClick={handleGameOver}>
+          <button type="button" onClick={() => dispatch({ type: "gameOver" })}>
             SWITCH
           </button>
         </div>
         <div>
           ShouldRestart : {state.shouldRestart.toString()}{" "}
-          <button type="button" onClick={handleRestart}>
+          <button type="button" onClick={() => dispatch({ type: "restart" })}>
             SWITCH
           </button>
         </div>
@@ -64,7 +74,9 @@ const Game = () => {
             <div key={index}>{state.board[el]}</div>
           ))}
         </div>
-        <div>Can you play : {state.canPlay().toString()}</div>
+        <div>
+          Can you play : {(state.isPlaying && state.whosTurn === 2).toString()}
+        </div>
       </div>
     </div>
   );

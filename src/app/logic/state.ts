@@ -1,51 +1,60 @@
 //* TYPES DEFINITION .
 interface ActionType {
   type: string;
-  payload?: boolean;
+  payload?: {
+    position: number[];
+    color: number;
+  };
 }
-//* INITIAL STATE .
-class InitialState {
+export interface State {
   isPlaying: boolean;
-  whosTurn: string;
+  whosTurn: number;
   isGameOver: boolean;
   shouldRestart: boolean;
-  board: { [k: string]: number[] };
-  constructor(
-    isPlaying: boolean = false,
-    whosTurn: string = "black",
-    isGameOver: boolean = false,
-    shouldRestart: boolean = false,
-    board: { [k: string]: number[] } = {
-      0: [0, 0, 0, 0, 0, 0, 0, 0],
-      1: [0, 0, 0, 0, 0, 0, 0, 0],
-      2: [0, 0, 0, 0, 0, 0, 0, 0],
-      3: [0, 0, 0, 1, 2, 0, 0, 0],
-      4: [0, 0, 0, 2, 1, 0, 0, 0],
-      5: [0, 0, 0, 0, 0, 0, 0, 0],
-      6: [0, 0, 0, 0, 0, 0, 0, 0],
-      7: [0, 0, 0, 0, 0, 0, 0, 0],
-    }
-  ) {
-    this.isPlaying = isPlaying;
-    this.whosTurn = whosTurn;
-    this.isGameOver = isGameOver;
-    this.shouldRestart = shouldRestart;
-    this.board = board;
-  }
-  canPlay() {
-    return this.isPlaying && this.whosTurn === "black";
-  }
+  board: number[][];
 }
-const initialState = new InitialState(false);
+//* INITIAL STATE .
+const initialState: State = {
+  isPlaying: false,
+  whosTurn: 2,
+  isGameOver: false,
+  shouldRestart: false,
+  board: [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 0, 0, 0],
+    [0, 0, 0, 2, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+};
 //* REDUCER .
-const reducer = (state: InitialState, action: ActionType) => {
+const reducer = (state: State, action: ActionType) => {
   switch (action.type) {
     case "start":
-      return new InitialState(!state.isPlaying);
+      return { ...state, isPlaying: !state.isPlaying };
     case "gameOver":
       return { ...state, isGameOver: !state.isGameOver };
     case "restart":
-      return { ...state, shouldRestart: !state.shouldRestart };
+      return { ...initialState, isPlaying: true };
+    case "switchPlayer":
+      return { ...state, whosTurn: state.whosTurn === 2 ? 1 : 2 };
+    case "move":
+      const newBoard = state.board.map((line, lineIndex) =>
+        line.map((cell, cellIndex) => {
+          if (!action.payload) return cell;
+          if (
+            lineIndex === action.payload.position[0] &&
+            cellIndex === action.payload.position[1]
+          ) {
+            return action.payload.color;
+          }
+          return cell;
+        })
+      );
+      return { ...state, board: newBoard };
     default:
       return state;
   }

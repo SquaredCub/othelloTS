@@ -11,24 +11,6 @@ const BlackPawn = () => <div className="bP"></div>;
 const Cell = ({ cellId, turn, setTurn }: Props) => {
   const [content, setContent] = useState(0);
   const contents = [null, <WhitePawn />, <BlackPawn />];
-  useEffect(() => {
-    switch (cellId) {
-      case "27":
-        setContent(1);
-        break;
-      case "28":
-        setContent(2);
-        break;
-      case "35":
-        setContent(2);
-        break;
-      case "36":
-        setContent(1);
-        break;
-      default:
-        setContent(0);
-    }
-  }, [cellId]);
   const handleClick = (e: React.MouseEvent) => {
     console.log(e.target);
     if (content === 0) {

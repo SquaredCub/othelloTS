@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "../style/main.scss";
 
 import Game from "./components/Game";
@@ -27,10 +26,3 @@ function App() {
 }
 
 export default App;
-/*
-
--> App
-  -> Layout
-    
-
-*/

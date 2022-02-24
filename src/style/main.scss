@@ -13,7 +13,7 @@ body,
   pointer-events: none;
   position: relative;
   &.active {
-    pointer-events: unset;
+    pointer-events: all;
   }
   #blocker {
     position: absolute;
@@ -36,6 +36,7 @@ body,
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
       .bP,
       .wP {
         width: 80%;
@@ -52,11 +53,12 @@ body,
     }
   }
 }
-.controls {
+.boardControls {
   margin: 1rem auto;
   max-width: max-content;
   display: flex;
   gap: 2rem;
+  cursor: pointer;
 }
 .rules {
   text-align: center;
