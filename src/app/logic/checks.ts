@@ -210,14 +210,14 @@ const isMoveLegal = ({ position, color, currentBoard }: Args) => {
     let pawnsToTurn: number[][] = [];
     if (!moveTakes) return pawnsToTurn;
     moveTakes.forEach((vector) => {
-      //let tempPawns: number[][] = [];
+      let tempPawns: number[][] = [];
       for (let x = 1; x < 7; x++) {
         const posValue =
           currentBoard[position[0] + vector[0] * x][
             position[1] + vector[1] * x
           ];
-        if (posValue !== undefined && posValue !== 0 && posValue !== color) {
-          pawnsToTurn.push([
+        if (posValue !== undefined && posValue !== color) {
+          tempPawns.push([
             position[0] + vector[0] * x,
             position[1] + vector[1] * x,
           ]);
@@ -225,6 +225,12 @@ const isMoveLegal = ({ position, color, currentBoard }: Args) => {
           break;
         }
       }
+      let tempCheck = true;
+      tempPawns.forEach((pos) => {
+        if (currentBoard[pos[0]][pos[1]] === 0) tempCheck = false;
+      });
+      if (!tempCheck) return;
+      tempPawns.forEach((pos) => pawnsToTurn.push(pos));
     });
     return pawnsToTurn;
   };

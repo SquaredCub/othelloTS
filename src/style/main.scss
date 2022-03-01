@@ -7,17 +7,3 @@
   display: none;
   text-align: center;
 }
-
-//! If vectors match, we must verify that ALL cells in between friends are white.
-//!
-//!
-//!                     2 <- when placing this one
-//!             1 1 1 1 1 <- this one should NOT change
-//!               1 1         only the two 1's in between the new and the bottom left 2
-//!               2 1
-//!                 2 2 2
-//!
-//!
-//!
-//!
-//!
