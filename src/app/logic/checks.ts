@@ -245,8 +245,12 @@ const isMoveLegal = ({ position, color, currentBoard }: Args) => {
       moveTakes,
       currentBoard,
     });
-    answer.status = true;
-    answer.pawnsTurned = pawnsToTurn;
+    if (pawnsToTurn.length === 0) {
+      answer.errorMessage += "This move does not take any opponent pawn";
+    } else {
+      answer.status = true;
+      answer.pawnsTurned = pawnsToTurn;
+    }
   }
 
   return answer;

@@ -7,12 +7,13 @@ interface Props {
   canPlay: boolean;
   state: State;
   dispatch: React.Dispatch<any>;
+  winner: string;
 }
 //. PAWS DEFINITION .
 const WhitePawn = () => <div className="wP"></div>;
 const BlackPawn = () => <div className="bP"></div>;
 //. JSX .
-const Board = ({ board, state, dispatch }: Props) => {
+const Board = ({ board, state, dispatch, winner }: Props) => {
   const handleCellClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
@@ -47,7 +48,13 @@ const Board = ({ board, state, dispatch }: Props) => {
           ))
         )}
       </div>
-      {(!state.isPlaying || state.isGameOver) && <div id="blocker"></div>}
+      {state.isGameOver && (
+        <div id="gameOverScreen">
+          <h2>Game Over</h2>
+          <h1>{winner} Won</h1>
+        </div>
+      )}
+      {!state.isPlaying && <div id="gamePausedScreen">Game Paused</div>}
     </div>
   );
 };

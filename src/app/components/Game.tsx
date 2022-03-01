@@ -30,16 +30,16 @@ const Game = () => {
     /* document.querySelector(".boardContainer")?.classList.add("active");
     return; */
     if (state.isGameOver || !state.isPlaying) return;
-
-    if (isThereAnyLegalMoves(state.board, state.whosTurn)) {
-      if (state.isPlaying && state.whosTurn === 2) {
-        document.querySelector(".boardContainer")?.classList.add("active");
-      } else {
-        //document.querySelector(".boardContainer")?.classList.remove("active");
-        //makeAiPlay();
-      }
+    if (!isThereAnyLegalMoves(state.board, state.whosTurn)) {
+      const otherPlayer = state.whosTurn === 2 ? 1 : 2;
+      if (!isThereAnyLegalMoves(state.board, otherPlayer))
+        dispatch({ type: "gameOver" });
+    }
+    if (state.isPlaying && state.whosTurn === 2) {
+      document.querySelector(".boardContainer")?.classList.add("active");
     } else {
-      dispatch({ type: "gameOver" });
+      //document.querySelector(".boardContainer")?.classList.remove("active");
+      //makeAiPlay();
     }
   }, [state]);
   //* RETURN STATEMENT .
@@ -66,6 +66,7 @@ const Game = () => {
         canPlay={state.isPlaying && state.whosTurn === 2}
         state={state}
         dispatch={dispatch}
+        winner={blackScore > whiteScore ? "Black" : "White"}
       />
       <div className="scoreContainer">
         <h2>Score : </h2>
