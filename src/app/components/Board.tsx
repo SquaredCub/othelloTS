@@ -19,20 +19,15 @@ const Board = ({ board, state, dispatch }: Props) => {
     const position = target.id.split(",").map((el) => parseInt(el));
     const color = state.whosTurn;
     const currentBoard = state.board;
-    console.log("User clicked " + position);
-    //* LOGGING RESULTS OF CHECKS .
-    /* console.log(`Position: [${target.id}]`);
-    console.log(`Color playing: ${state.whosTurn}`); */
-    //console.log(isMoveLegal({ position, color, currentBoard }));
     //* Taking action :
     const move = isMoveLegal({ position, color, currentBoard });
     if (move.status) {
-      console.log("%cLegal move, proceeding", "color: green");
       dispatch({ type: "move", payload: { position, color } });
-      console.log(move.pawnsTurned);
-      //dispatch({ type: "switchPlayer" });
-    } else {
-      //console.log(isMoveLegal({ position, color, currentBoard }), "color: red");
+      dispatch({
+        type: "convert",
+        payload: { pawnsToTurn: move.pawnsTurned, color: color },
+      });
+      dispatch({ type: "switchPlayer" });
     }
   };
   return (
@@ -47,7 +42,7 @@ const Board = ({ board, state, dispatch }: Props) => {
               onClick={handleCellClick}
             >
               {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
-              <span className="tooltip">{`${lineIndex},${cellIndex}`}</span>
+              {/* <span className="tooltip">{`${lineIndex},${cellIndex}`}</span> */}
             </div>
           ))
         )}

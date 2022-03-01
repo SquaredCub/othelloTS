@@ -12,7 +12,7 @@ interface Response {
 }
 //. CELL TAKEN CHECK .
 const isCellTaken = ({ position, color, currentBoard }: Args) => {
-  if (currentBoard[position[0]][position[1]] === 0) return false;
+  if (currentBoard[position[0]][position[1]] !== 0) return true;
   return currentBoard[position[0]][position[1]];
 };
 
@@ -24,63 +24,51 @@ const hasColorMatchInLine = ({
 }: Args): false | number[][] => {
   //* Horizontal Check :
   let matches: number[][] = [];
-  for (let x = 0; x < 7; x++) {
+  for (let x = 0; x < 8; x++) {
     if (currentBoard[position[0]][x] === color) matches.push([position[0], x]);
   }
   //* Vertical Check :
-  for (let y = 0; y < 7; y++) {
+  for (let y = 0; y < 8; y++) {
     if (currentBoard[y][position[1]] === color) matches.push([y, position[1]]);
   }
 
-  //* Diagonal Check (top to bottom):
-  const findTopToBottomDiagOrigin = (position: number[]) => {
-    let diagOrigin: number[] = [];
+  //* TopLeft Diagonal Check :
+  const findTopLeftDiagOrigin = (position: number[]) => {
+    let diagOrigin = position;
+    if (diagOrigin[0] === 0 || diagOrigin[1] === 0) return diagOrigin;
+
     for (let x = 0; x < 7; x++) {
       diagOrigin = [position[0] - x, position[1] - x];
-      if (position[0] - x === 0) break;
-      if (position[1] - x === 0) break;
+      if (diagOrigin[0] === 0 || diagOrigin[1] === 0) break;
     }
+
     return diagOrigin;
   };
-  const topToBottomDiagOrigin = findTopToBottomDiagOrigin(position);
-  for (let x = 0; x < 7; x++) {
-    if (topToBottomDiagOrigin[0] + x === 7) break;
-    if (topToBottomDiagOrigin[1] + x === 7) break;
-    if (
-      currentBoard[topToBottomDiagOrigin[0] + x][
-        topToBottomDiagOrigin[1] + x
-      ] === color
-    )
-      matches.push([
-        topToBottomDiagOrigin[0] + x,
-        topToBottomDiagOrigin[1] + x,
-      ]);
+  const topLeft = findTopLeftDiagOrigin(position);
+  for (let x = 0; x <= 7; x++) {
+    if (currentBoard[topLeft[0] + x] === undefined) break;
+    if (currentBoard[topLeft[0] + x][topLeft[1] + x] === undefined) break;
+    const posValue = currentBoard[topLeft[0] + x][topLeft[1] + x];
+    if (posValue === color) matches.push([topLeft[0] + x, topLeft[1] + x]);
   }
-  //* Diagonal Check (bottom to top) :
-  const findBottomToTopDiagOrigin = (position: number[]) => {
-    let diagOrigin: number[] = [];
-    for (let x = 0; x < 7; x++) {
-      diagOrigin = [position[0] + x, position[1] - x];
-      if (position[0] + x === 7) break;
-      if (position[1] - x === 0) break;
+  //* TopRight Diagonal Check :
+  const findTopRightDiagOrigin = (position: number[]) => {
+    let diagOrigin = position;
+    if (diagOrigin[0] === 0 || diagOrigin[1] === 7) return diagOrigin;
+
+    for (let x = 0; x <= 7; x++) {
+      diagOrigin = [position[0] - x, position[1] + x];
+      if (diagOrigin[0] === 0 || diagOrigin[1] === 7) break;
     }
+
     return diagOrigin;
   };
-  const bottomToTopDiagOrigin = findBottomToTopDiagOrigin(position);
-  for (let x = 0; x < 7; x++) {
-    if (bottomToTopDiagOrigin[0] - x === 0) break;
-    if (bottomToTopDiagOrigin[1] + x === 7) break;
-    if (
-      currentBoard[bottomToTopDiagOrigin[0] - x][
-        bottomToTopDiagOrigin[1] + x
-      ] === color
-    ) {
-      const coord: number[] = [
-        bottomToTopDiagOrigin[0] - x,
-        bottomToTopDiagOrigin[1] + x,
-      ];
-      matches.push(coord);
-    }
+  const topRight = findTopRightDiagOrigin(position);
+  for (let x = 0; x <= 7; x++) {
+    if (currentBoard[topRight[0] + x] === undefined) break;
+    if (currentBoard[topRight[0] + x][topRight[1] - x] === undefined) break;
+    const posValue = currentBoard[topRight[0] + x][topRight[1] - x];
+    if (posValue === color) matches.push([topRight[0] + x, topRight[1] - x]);
   }
   //* Checking the results :
   if (matches.length > 0) return matches;
@@ -123,15 +111,17 @@ const isOpponentAdjacent = ({ position, color, currentBoard }: Args) => {
       ]);
     }
   }
-  //console.log("%cAdjacent matches : ", "color: salmon");
-  //console.log(matches);
   //* Checking the results .
   if (matches.length > 0) return matches;
   return false;
 };
 
 //. MOVE IS TAKING OPPONENT PAWNS CHECK .
-const isMoveTaking = ({ position, color, currentBoard }: Args) => {
+const isMoveTaking = ({
+  position,
+  color,
+  currentBoard,
+}: Args): number[][] | false => {
   const cellTaken = isCellTaken({ position, color, currentBoard });
   const friendsInLine = hasColorMatchInLine({ position, color, currentBoard });
   const adjacentOpponents = isOpponentAdjacent({
@@ -187,20 +177,19 @@ const isMoveTaking = ({ position, color, currentBoard }: Args) => {
     )
       return true;
   });
-
   if (vectorsThatScore.length === 0) return false;
   else return vectorsThatScore;
 };
 
 //. IS IT LEGAL CHECK .
-const isMoveLegal = ({ position, color, currentBoard }: Args): Response => {
+const isMoveLegal = ({ position, color, currentBoard }: Args) => {
   let answer: Response = {
     status: false,
     errorMessage: "%cInvalid move : %c",
     pawnsTurned: [],
   };
-  const cellFree = isCellTaken({ position, color, currentBoard });
-  if (!cellFree) answer.errorMessage += "Cell is already taken";
+  const cellTaken = isCellTaken({ position, color, currentBoard });
+  if (cellTaken) answer.errorMessage += "Cell is already taken";
 
   const friendsInLine = hasColorMatchInLine({ position, color, currentBoard });
   if (!friendsInLine) answer.errorMessage += "No friends in line";
@@ -217,24 +206,29 @@ const isMoveLegal = ({ position, color, currentBoard }: Args): Response => {
     color,
     currentBoard,
     moveTakes,
-  }: Args) => {
+  }: Args): number[][] => {
     let pawnsToTurn: number[][] = [];
     if (!moveTakes) return pawnsToTurn;
     moveTakes.forEach((vector) => {
-      for (let x = 0; x < 7; x++) {
+      //let tempPawns: number[][] = [];
+      for (let x = 1; x < 7; x++) {
         const posValue =
           currentBoard[position[0] + vector[0] * x][
             position[1] + vector[1] * x
           ];
-        if (posValue !== undefined && posValue !== 0 && posValue !== color)
+        if (posValue !== undefined && posValue !== 0 && posValue !== color) {
           pawnsToTurn.push([
             position[0] + vector[0] * x,
             position[1] + vector[1] * x,
           ]);
+        } else {
+          break;
+        }
       }
     });
     return pawnsToTurn;
   };
+
   const moveTakes = isMoveTaking({ position, color, currentBoard });
   if (!moveTakes)
     answer.errorMessage += "This move does not take any opponent pawn";
@@ -258,22 +252,11 @@ const isThereAnyLegalMoves = (currentBoard: number[][], color: number) => {
   for (let x = 0; x < 7; x++) {
     for (let y = 0; y < 8; y++) {
       const position = [x, y];
-      console.log("Checking position : " + position.toString());
       if (isMoveLegal({ position, color, currentBoard }).status) {
-        console.log(
-          log + "%cThere is at least one more possibilty",
-          "color: white",
-          "color: green"
-        );
         return true;
       }
     }
   }
-  console.log(
-    log + "%cThere is no more possible moves. Game Over",
-    "color: white",
-    "color: red"
-  );
   return false;
 };
 

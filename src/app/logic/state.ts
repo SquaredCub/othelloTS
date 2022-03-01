@@ -4,6 +4,7 @@ interface ActionType {
   payload?: {
     position: number[];
     color: number;
+    pawnsToTurn: number[][];
   };
 }
 export interface State {
@@ -56,7 +57,22 @@ const reducer = (state: State, action: ActionType) => {
       );
       return { ...state, board: newBoard };
     case "convert":
-      break;
+      if (!action.payload) return state;
+      let turnedBoard: number[][] = [...state.board];
+      for (let x = 0; x < action.payload.pawnsToTurn.length; x++) {
+        turnedBoard = turnedBoard.map((line, lineIndex) => {
+          return line.map((cell, cellIndex) => {
+            if (
+              lineIndex === action.payload?.pawnsToTurn[x][0] &&
+              cellIndex === action.payload?.pawnsToTurn[x][1]
+            ) {
+              return action.payload.color;
+            }
+            return cell;
+          });
+        });
+      }
+      return { ...state, board: turnedBoard };
     default:
       return state;
   }

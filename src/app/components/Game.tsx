@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from "react";
 import { reducer, initialState } from "../logic/state";
 import { isThereAnyLegalMoves } from "../logic/checks";
 import { makeAiPlay } from "../logic/ai";
+import { findScore } from "../logic/score";
 import Board from "./Board";
 
 //. Component .
@@ -11,8 +12,15 @@ const Game = () => {
     reducer,
     initialState
   );
+  const [blackScore, setBlackScore] = useState(findScore(2, state.board));
+  const [whiteScore, setWhiteScore] = useState(findScore(1, state.board));
+  const colors = [0, "White", "Black"];
   //* OBSERVING STATE .
   useEffect(() => {
+    const blackScore = findScore(2, state.board);
+    setBlackScore(blackScore);
+    const whiteScore = findScore(1, state.board);
+    setWhiteScore(whiteScore);
     /* Is there any legal moves ? 
         If so, 
           if it's the player turn, activate the board and let him make a move
@@ -27,8 +35,8 @@ const Game = () => {
       if (state.isPlaying && state.whosTurn === 2) {
         document.querySelector(".boardContainer")?.classList.add("active");
       } else {
-        document.querySelector(".boardContainer")?.classList.remove("active");
-        makeAiPlay();
+        //document.querySelector(".boardContainer")?.classList.remove("active");
+        //makeAiPlay();
       }
     } else {
       dispatch({ type: "gameOver" });
@@ -36,7 +44,7 @@ const Game = () => {
   }, [state]);
   //* RETURN STATEMENT .
   return (
-    <div>
+    <div className="gameContainer">
       {/* CONTROLS */}
       <div className="boardControls">
         <button type="button" onClick={() => dispatch({ type: "start" })}>
@@ -48,6 +56,10 @@ const Game = () => {
           </button>
         ) : null}
       </div>
+      {/* GAME INFORMATION */}
+      <div className="gameInfo">
+        <p>{colors[state.whosTurn]}'s turn</p>
+      </div>
       {/* ACTUAL BOARD */}
       <Board
         board={state.board}
@@ -55,6 +67,11 @@ const Game = () => {
         state={state}
         dispatch={dispatch}
       />
+      <div className="scoreContainer">
+        <h2>Score : </h2>
+        <div>Black : {blackScore} pawns</div>
+        <div>White : {whiteScore} pawns</div>
+      </div>
       <div className="stateDisplay">
         {/* STATE DISPLAY */}
         <h3>State: </h3>

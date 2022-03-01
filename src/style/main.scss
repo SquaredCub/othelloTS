@@ -1,77 +1,23 @@
 @import "reset";
 @import "vars";
 @import "defaults";
-html,
-body,
-#root {
-  height: 100%;
-}
-.boardContainer {
-  background-color: var(--clr-board-background);
-  width: max-content;
-  margin: 0 auto;
-  pointer-events: none;
-  position: relative;
-  &.active {
-    pointer-events: all;
-  }
-  #blocker {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-  }
-  .board {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    gap: var(--boardSpacing);
-    padding: var(--boardSpacing);
-    .cell {
-      width: var(--cellSize);
-      height: var(--cellSize);
-      background-color: var(--clr-board-cells);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      cursor: pointer;
-      .bP,
-      .wP {
-        width: 80%;
-        height: 80%;
-        border-radius: 100%;
-        pointer-events: none;
-      }
-      .bP {
-        background-color: black;
-      }
-      .wP {
-        background-color: white;
-      }
-      & > span {
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 0.5;
-        pointer-events: none;
-        background-color: yellow;
-      }
-    }
-  }
-}
-.boardControls {
-  margin: 1rem auto;
-  max-width: max-content;
-  display: flex;
-  gap: 2rem;
-  cursor: pointer;
-}
+@import "game";
+
 .rules {
+  display: none;
   text-align: center;
 }
-.stateDisplay {
-  font-size: 0.7rem;
-}
+
+//! If vectors match, we must verify that ALL cells in between friends are white.
+//!
+//!
+//!                     2 <- when placing this one
+//!             1 1 1 1 1 <- this one should NOT change
+//!               1 1         only the two 1's in between the new and the bottom left 2
+//!               2 1
+//!                 2 2 2
+//!
+//!
+//!
+//!
+//!
