@@ -36,6 +36,7 @@ body,
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
       cursor: pointer;
       .bP,
       .wP {
@@ -49,6 +50,14 @@ body,
       }
       .wP {
         background-color: white;
+      }
+      & > span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0.5;
+        pointer-events: none;
+        background-color: yellow;
       }
     }
   }

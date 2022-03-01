@@ -12,7 +12,6 @@ const Cell = ({ cellId, turn, setTurn }: Props) => {
   const [content, setContent] = useState(0);
   const contents = [null, <WhitePawn />, <BlackPawn />];
   const handleClick = (e: React.MouseEvent) => {
-    console.log(e.target);
     if (content === 0) {
       if (turn) setContent(1);
       else setContent(2);

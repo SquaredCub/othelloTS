@@ -19,7 +19,10 @@ const Game = () => {
           if not, deactivate the board and make the AI play
         If not, dispatch the gameover action
     */
-    if (state.isGameOver) return;
+    /* document.querySelector(".boardContainer")?.classList.add("active");
+    return; */
+    if (state.isGameOver || !state.isPlaying) return;
+
     if (isThereAnyLegalMoves(state.board, state.whosTurn)) {
       if (state.isPlaying && state.whosTurn === 2) {
         document.querySelector(".boardContainer")?.classList.add("active");

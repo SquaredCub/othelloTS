@@ -55,6 +55,8 @@ const reducer = (state: State, action: ActionType) => {
         })
       );
       return { ...state, board: newBoard };
+    case "convert":
+      break;
     default:
       return state;
   }
