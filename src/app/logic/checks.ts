@@ -96,6 +96,7 @@ const moveOutput = ({
   //. End of vector checking. Results are in vectorTakes
   //. For each vector, we either get FALSE if vector does not take, or we get an array of positions to take. (vectorTakes is always 8 in length)
   const setOfNumberArrays = new Set(vectorTakes);
+
   if (setOfNumberArrays.size > 1) {
     takes = [];
     setOfNumberArrays.forEach((vectorsArray) => {
