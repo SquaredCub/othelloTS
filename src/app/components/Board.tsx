@@ -1,6 +1,6 @@
 import React from "react";
 import { State } from "../logic/state";
-import { isMoveLegal } from "../logic/checks";
+import { isMoveLegal, moveOutput } from "../logic/checks";
 //. TYPES DEFINITION .
 interface Props {
   board: number[][];
@@ -18,18 +18,18 @@ const Board = ({ board, state, dispatch, winner }: Props) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
     const position = target.id.split(",").map((el) => parseInt(el));
+    console.log("user clicked on " + position);
     const color = state.whosTurn;
     const currentBoard = state.board;
     //* Taking action :
-    const move = isMoveLegal({ position, color, currentBoard });
-    if (move.status) {
-      dispatch({ type: "move", payload: { position, color } });
-      dispatch({
-        type: "convert",
-        payload: { pawnsToTurn: move.pawnsTurned, color: color },
-      });
-      dispatch({ type: "switchPlayer" });
-    }
+    const move = moveOutput({ position, color, currentBoard });
+    if (!move.takes) return;
+    dispatch({ type: "move", payload: { position, color } });
+    dispatch({
+      type: "convert",
+      payload: { pawnsToTurn: move.takes, color: color },
+    });
+    dispatch({ type: "switchPlayer" });
   };
   return (
     <div className="boardContainer">
@@ -43,7 +43,11 @@ const Board = ({ board, state, dispatch, winner }: Props) => {
               onClick={handleCellClick}
             >
               {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
-              {/* <span className="tooltip">{`${lineIndex},${cellIndex}`}</span> */}
+              {/* DEVELOPER HELP */}
+              <span
+                className="tooltip"
+                style={{ color: "black" }}
+              >{`${lineIndex},${cellIndex}`}</span>
             </div>
           ))
         )}
