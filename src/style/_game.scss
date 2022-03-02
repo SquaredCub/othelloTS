@@ -64,6 +64,16 @@
           pointer-events: none;
           background-color: yellow;
         }
+        &.legal::after {
+          content: "";
+          position: absolute;
+          top: 10%;
+          left: 10%;
+          width: 80%;
+          height: 80%;
+          border-radius: 100%;
+          border: 2px solid var(--clr-board-background);
+        }
       }
     }
   }

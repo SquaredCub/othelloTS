@@ -1,6 +1,6 @@
 import React from "react";
 import { State } from "../logic/state";
-import { isMoveLegal, moveOutput } from "../logic/checks";
+import { moveOutput } from "../logic/checks";
 //. TYPES DEFINITION .
 interface Props {
   board: number[][];
@@ -8,17 +8,18 @@ interface Props {
   state: State;
   dispatch: React.Dispatch<any>;
   winner: string;
+  legalMoves: number[][];
 }
 //. PAWS DEFINITION .
 const WhitePawn = () => <div className="wP"></div>;
 const BlackPawn = () => <div className="bP"></div>;
 //. JSX .
-const Board = ({ board, state, dispatch, winner }: Props) => {
+const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
   const handleCellClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
     const position = target.id.split(",").map((el) => parseInt(el));
-    console.log("user clicked on " + position);
+
     const color = state.whosTurn;
     const currentBoard = state.board;
     //* Taking action :
@@ -35,21 +36,31 @@ const Board = ({ board, state, dispatch, winner }: Props) => {
     <div className="boardContainer">
       <div className="board">
         {board.map((line, lineIndex) =>
-          line.map((cell, cellIndex) => (
-            <div
-              key={`${lineIndex},${cellIndex}`}
-              className="cell"
-              id={`${lineIndex},${cellIndex}`}
-              onClick={handleCellClick}
-            >
-              {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
-              {/* DEVELOPER HELP */}
-              <span
-                className="tooltip"
-                style={{ color: "black" }}
-              >{`${lineIndex},${cellIndex}`}</span>
-            </div>
-          ))
+          line.map((cell, cellIndex) => {
+            const pos = [lineIndex, cellIndex];
+            let matching = false;
+            legalMoves.forEach((legalPos) => {
+              const match = legalPos.every((element, index) => {
+                return element === pos[index];
+              });
+              if (match) matching = true;
+            });
+            return (
+              <div
+                key={pos.toString()}
+                className={matching ? "cell legal" : "cell"}
+                id={pos.toString()}
+                onClick={handleCellClick}
+              >
+                {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
+                {/* DEVELOPER HELP */}
+                {/* <span
+                  className="tooltip"
+                  style={{ color: "black" }}
+                >{`${lineIndex},${cellIndex}`}</span> */}
+              </div>
+            );
+          })
         )}
       </div>
       {state.isGameOver && (

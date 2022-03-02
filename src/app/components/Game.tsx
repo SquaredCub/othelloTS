@@ -14,27 +14,37 @@ const Game = () => {
   );
   const [blackScore, setBlackScore] = useState(findScore(2, state.board));
   const [whiteScore, setWhiteScore] = useState(findScore(1, state.board));
+  const [legalMoves, setLegalMoves] = useState<number[][]>([]);
   const colors = [0, "White", "Black"];
-  //* OBSERVING STATE .
+  //. OBSERVING STATE .
   useEffect(() => {
+    //* We measure the score :
     const blackScore = findScore(2, state.board);
     setBlackScore(blackScore);
     const whiteScore = findScore(1, state.board);
     setWhiteScore(whiteScore);
-    /* Is there any legal moves ? 
-        If so, 
-          if it's the player turn, activate the board and let him make a move
-          if not, deactivate the board and make the AI play
-        If not, dispatch the gameover action
-    */
-    /* document.querySelector(".boardContainer")?.classList.add("active");
-    return; */
+    //* Early exit if the game is over or we're not playing
     if (state.isGameOver || !state.isPlaying) return;
-    if (!isThereAnyLegalMoves(state.board, state.whosTurn)) {
+
+    //* Checking if the player still has a legal move
+    const legalReturn = isThereAnyLegalMoves(state.board, state.whosTurn);
+    //* If not, we check if the opponent can still play
+    if (!legalReturn) {
+      setLegalMoves([]);
       const otherPlayer = state.whosTurn === 2 ? 1 : 2;
-      if (!isThereAnyLegalMoves(state.board, otherPlayer))
+      //* If nobody can play -> Game over
+      if (!isThereAnyLegalMoves(state.board, otherPlayer)) {
         dispatch({ type: "gameOver" });
+        //* Otherwise we alert the player he can't play and that the opponent's turn will come instead
+      } else {
+        alert("Switching player because you have no legal moves");
+        dispatch({ type: "switchPlayer" });
+      }
+    } else {
+      //* If there's still legal moves, we store them in the state
+      setLegalMoves(legalReturn);
     }
+    //* Then we check who's turn it is :
     if (state.isPlaying && state.whosTurn === 2) {
       document.querySelector(".boardContainer")?.classList.add("active");
     } else {
@@ -42,7 +52,7 @@ const Game = () => {
       //makeAiPlay();
     }
   }, [state]);
-  //* RETURN STATEMENT .
+  //. RETURN STATEMENT .
   return (
     <div className="gameContainer">
       {/* CONTROLS */}
@@ -67,6 +77,7 @@ const Game = () => {
         state={state}
         dispatch={dispatch}
         winner={blackScore > whiteScore ? "Black" : "White"}
+        legalMoves={legalMoves}
       />
       <div className="scoreContainer">
         <h2>Score : </h2>
