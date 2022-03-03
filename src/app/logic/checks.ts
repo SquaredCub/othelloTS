@@ -14,6 +14,12 @@ const isCellTaken = ({ position, color, currentBoard }: Args) => {
 };
 
 //. Vector checking .
+/**
+ * @param  {number[]} {position
+ * @param  {number} color
+ * @param  {number[][]} currentBoard}
+ * @return {false | number[][]} takes
+ */
 const moveOutput = ({
   position,
   color,
@@ -109,12 +115,18 @@ const moveOutput = ({
 };
 
 //. GAME OVER CHECK .
+/**
+ * @param  {number[][]} currentBoard
+ * @param  {number} color
+ * @return {false | number[][]} legalMoves
+ */
 const isThereAnyLegalMoves = (currentBoard: number[][], color: number) => {
   const legalMoves: number[][] = [];
   currentBoard.forEach((line, lineIndex) => {
     line.forEach((cell, cellIndex) => {
       const position = [lineIndex, cellIndex];
-      if (moveOutput({ position, color, currentBoard }).takes !== false) {
+      const moveTakes = moveOutput({ position, color, currentBoard });
+      if (moveTakes.takes !== false) {
         legalMoves.push(position);
       }
     });

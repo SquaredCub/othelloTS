@@ -7,3 +7,55 @@
   display: none;
   text-align: center;
 }
+.prevBoard {
+  margin-block: 1rem;
+}
+.prev {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: var(--boardSpacing);
+  padding: var(--boardSpacing);
+  .cell {
+    margin: 3px;
+    width: var(--cellSize);
+    height: var(--cellSize);
+    background-color: var(--clr-board-cells);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    .bP,
+    .wP {
+      width: 80%;
+      height: 80%;
+      border-radius: 100%;
+      pointer-events: none;
+    }
+    .bP {
+      background-color: black;
+    }
+    .wP {
+      background-color: white;
+    }
+    & > span {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.5;
+      pointer-events: none;
+      background-color: yellow;
+    }
+    &.legal::after {
+      content: "";
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+      border-radius: 100%;
+      border: 2px solid var(--clr-board-background);
+    }
+  }
+}

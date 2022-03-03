@@ -15,9 +15,13 @@ const Game = () => {
   const [blackScore, setBlackScore] = useState(findScore(2, state.board));
   const [whiteScore, setWhiteScore] = useState(findScore(1, state.board));
   const [legalMoves, setLegalMoves] = useState<number[][]>([]);
+  const [previousState, setPreviousState] = useState<any[]>([]);
+  const [selectedState, setSelectedState] = useState(0);
   const colors = [0, "White", "Black"];
+
   //. OBSERVING STATE .
   useEffect(() => {
+    setPreviousState((old) => [...old, state.board]);
     //* We measure the score :
     const blackScore = findScore(2, state.board);
     setBlackScore(blackScore);
@@ -37,7 +41,11 @@ const Game = () => {
         dispatch({ type: "gameOver" });
         //* Otherwise we alert the player he can't play and that the opponent's turn will come instead
       } else {
-        alert("Switching player because you have no legal moves");
+        alert(
+          `Switching ${
+            colors[state.whosTurn]
+          }'s turn because he has no legal moves`
+        );
         dispatch({ type: "switchPlayer" });
       }
     } else {
@@ -48,8 +56,8 @@ const Game = () => {
     if (state.isPlaying && state.whosTurn === 2) {
       document.querySelector(".boardContainer")?.classList.add("active");
     } else {
-      //document.querySelector(".boardContainer")?.classList.remove("active");
-      //makeAiPlay();
+      document.querySelector(".boardContainer")?.classList.remove("active");
+      makeAiPlay(dispatch, state.board, 1);
     }
   }, [state]);
   //. RETURN STATEMENT .
@@ -61,7 +69,13 @@ const Game = () => {
           {state.isPlaying ? "Pause Game" : "Start Game"}
         </button>
         {state.isPlaying ? (
-          <button type="button" onClick={() => dispatch({ type: "restart" })}>
+          <button
+            type="button"
+            onClick={() => {
+              dispatch({ type: "restart" });
+              document.querySelector(".prev").innerHTML = "";
+            }}
+          >
             {"Restart Game"}
           </button>
         ) : null}
@@ -83,6 +97,36 @@ const Game = () => {
         <h2>Score : </h2>
         <div>Black : {blackScore} pawns</div>
         <div>White : {whiteScore} pawns</div>
+      </div>
+      <div className="prev">
+        <div className="prevSelector">
+          <span>{"<"}</span>
+          <span>{">"}</span>
+        </div>
+        {previousState.length > 0 &&
+          previousState.map((board) =>
+            board.map((line, lineIndex) => (
+              <div className="prevBoard">
+                {line.map((cell, cellIndex) => {
+                  const pos = [lineIndex, cellIndex];
+                  return (
+                    <div
+                      key={pos.toString()}
+                      className={"cell"}
+                      id={pos.toString()}
+                    >
+                      {cell ? (cell === 1 ? "w" : "b") : null}
+                      {/* DEVELOPER HELP */}
+                      {/* <span
+                    className="tooltip"
+                    style={{ color: "black" }}
+                  >{`${lineIndex},${cellIndex}`}</span> */}
+                    </div>
+                  );
+                })}
+              </div>
+            ))
+          )}
       </div>
       <div className="stateDisplay">
         {/* STATE DISPLAY */}
