@@ -137,4 +137,5 @@ const isThereAnyLegalMoves = (currentBoard: number[][], color: number) => {
 
 export { isThereAnyLegalMoves, moveOutput };
 
-// 12.35€
+//! ATTENTION, IF 1212* where * = new move from white
+//! turns into 11111 instead of 12111

@@ -3,82 +3,85 @@
     margin: 1rem auto;
     width: max-content;
   }
-  .boardControls {
-    display: flex;
-    gap: 2rem;
-    cursor: pointer;
-  }
-  .boardContainer {
-    background-color: var(--clr-board-background);
-    pointer-events: none;
-    position: relative;
-    &.active {
-      pointer-events: all;
-    }
-    #gameOverScreen,
-    #gamePausedScreen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--clr-background);
-      opacity: 0.8;
-      display: grid;
+  &__board {
+    .boardControls {
+      display: flex;
+      gap: 2rem;
+      cursor: pointer;
       justify-content: center;
+    }
+    .gameInfo {
       text-align: center;
     }
-    .board {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(8, 1fr);
-      gap: var(--boardSpacing);
-      padding: var(--boardSpacing);
-      .cell {
-        width: var(--cellSize);
-        height: var(--cellSize);
-        background-color: var(--clr-board-cells);
-        display: flex;
+    .boardContainer {
+      background-color: var(--clr-board-background);
+      pointer-events: none;
+      position: relative;
+      &.active {
+        pointer-events: all;
+      }
+      #gameOverScreen,
+      #gamePausedScreen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--clr-background);
+        opacity: 0.8;
+        display: grid;
         justify-content: center;
-        align-items: center;
-        position: relative;
-        cursor: pointer;
-        .bP,
-        .wP {
-          width: 80%;
-          height: 80%;
-          border-radius: 100%;
-          pointer-events: none;
-        }
-        .bP {
-          background-color: black;
-        }
-        .wP {
-          background-color: white;
-        }
-        & > span {
-          position: absolute;
-          top: 0;
-          left: 0;
-          opacity: 0.5;
-          pointer-events: none;
-          background-color: yellow;
-        }
-        &.legal::after {
-          content: "";
-          position: absolute;
-          top: 10%;
-          left: 10%;
-          width: 80%;
-          height: 80%;
-          border-radius: 100%;
-          border: 2px solid var(--clr-board-background);
+        text-align: center;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        gap: var(--boardSpacing);
+        padding: var(--boardSpacing);
+        .cell {
+          width: var(--cellSize);
+          height: var(--cellSize);
+          background-color: var(--clr-board-cells);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          cursor: pointer;
+          & > span {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.5;
+            pointer-events: none;
+            background-color: yellow;
+          }
+          &.legal::after {
+            content: "";
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border-radius: 100%;
+            border: 2px solid var(--clr-board-background);
+          }
         }
       }
     }
   }
-  .stateDisplay {
-    display: none;
-    font-size: 0.7rem;
+  @media screen and (min-width: 768px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: "score game cheat";
+    .scoreContainer {
+      grid-area: score;
+    }
+    .cheatInspector {
+      grid-area: cheat;
+    }
+    .gameContainer__board {
+      grid-area: game;
+    }
   }
 }

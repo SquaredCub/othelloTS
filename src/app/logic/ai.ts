@@ -46,6 +46,7 @@ const makeAiPlay = (
   );
   const indexOfMax = calculations.indexOf(maxCalculation);
   const position = moves[indexOfMax];
+
   dispatch({ type: "move", payload: { position, color } });
   dispatch({
     type: "convert",

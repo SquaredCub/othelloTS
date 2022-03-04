@@ -1,6 +1,7 @@
 import React from "react";
 import { State } from "../logic/state";
 import { moveOutput } from "../logic/checks";
+import { WhitePawn, BlackPawn } from "./Pawns";
 //. TYPES DEFINITION .
 interface Props {
   board: number[][];
@@ -11,8 +12,7 @@ interface Props {
   legalMoves: number[][];
 }
 //. PAWS DEFINITION .
-const WhitePawn = () => <div className="wP"></div>;
-const BlackPawn = () => <div className="bP"></div>;
+
 //. JSX .
 const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
   const handleCellClick = (e: React.MouseEvent) => {

@@ -3,59 +3,91 @@
 @import "defaults";
 @import "game";
 
+main {
+  display: flex;
+  flex-wrap: wrap;
+  & > * {
+    flex: 1 1 100%;
+  }
+}
 .rules {
-  display: none;
-  text-align: center;
-}
-.prevBoard {
-  margin-block: 1rem;
-}
-.prev {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: var(--boardSpacing);
-  padding: var(--boardSpacing);
-  .cell {
-    margin: 3px;
-    width: var(--cellSize);
-    height: var(--cellSize);
-    background-color: var(--clr-board-cells);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+  overflow: hidden;
+  &__title {
     cursor: pointer;
-    .bP,
-    .wP {
-      width: 80%;
-      height: 80%;
-      border-radius: 100%;
-      pointer-events: none;
+    width: max-content;
+    margin: 0 auto;
+    position: absolute;
+    top: 0;
+  }
+  &__content {
+    padding-inline: 1rem;
+    max-height: 0px;
+    transition: max-height 0.5s ease-in-out;
+    transition-delay: 0;
+    p {
+      padding-block: 0.3rem;
     }
-    .bP {
-      background-color: black;
+    &.active {
+      max-height: 1000px;
     }
-    .wP {
-      background-color: white;
+  }
+}
+.cheatInspector {
+  .prevSelector {
+    display: flex;
+    justify-content: space-between;
+    &__controls {
+      display: flex;
+      gap: 0.5rem;
+      span {
+        border: 1px solid white;
+        height: 1.5rem;
+        aspect-ratio: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--clr-background);
+        &:hover {
+          filter: invert(1);
+        }
+      }
     }
-    & > span {
-      position: absolute;
-      top: 0;
-      left: 0;
-      opacity: 0.5;
-      pointer-events: none;
-      background-color: yellow;
-    }
-    &.legal::after {
-      content: "";
-      position: absolute;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      height: 80%;
-      border-radius: 100%;
-      border: 2px solid var(--clr-board-background);
+  }
+  .prev {
+    --boardSpacing: 3px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: var(--boardSpacing);
+    padding: var(--boardSpacing);
+    .cell {
+      --cellSize: 20px;
+      width: var(--cellSize);
+      height: var(--cellSize);
+      background-color: var(--clr-board-cells);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      & > span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0.5;
+        pointer-events: none;
+        background-color: yellow;
+      }
+      &.legal::after {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        width: 80%;
+        height: 80%;
+        border-radius: 100%;
+        border: 2px solid var(--clr-board-background);
+      }
     }
   }
 }

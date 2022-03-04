@@ -44,4 +44,5 @@ const target = [
   [7, 0],
   [7, 7],
 ];
+
 export { vectors, avoid, target };

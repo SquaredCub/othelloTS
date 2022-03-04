@@ -13,6 +13,10 @@ h2 {
   font-weight: bold;
   text-align: center;
 }
+h3 {
+  text-decoration: underline;
+  padding: 0.5rem;
+}
 button {
   border: 1px solid var(--clr-text);
   padding: 0.2rem;
@@ -30,4 +34,23 @@ body {
   color: var(--clr-text);
   font-family: "Trebuchet MS", sans-serif;
   padding-top: 1rem;
+}
+
+.bP,
+.wP {
+  width: 80%;
+  height: 80%;
+  border-radius: 100%;
+  pointer-events: none;
+}
+.bP {
+  background-color: black;
+}
+.wP {
+  background-color: white;
+}
+ol {
+  list-style-type: square;
+  text-indent: 0.5rem;
+  list-style-position: inside;
 }
