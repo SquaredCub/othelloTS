@@ -11,11 +11,9 @@ interface Props {
   winner: string;
   legalMoves: number[][];
 }
-//. PAWS DEFINITION .
-
-//. JSX .
+//. Component .
 const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
-  const handleCellClick = (e: React.MouseEvent) => {
+  const handleCellClick = async (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
     const position = target.id.split(",").map((el) => parseInt(el));
@@ -25,13 +23,26 @@ const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
     //* Taking action :
     const move = moveOutput({ position, color, currentBoard });
     if (!move.takes) return;
+    const actions = [
+      { type: "animate" },
+      { type: "move", payload: { position, color } },
+      {
+        type: "convert",
+        payload: { pawnsToTurn: move.takes, color: color },
+      },
+      { type: "switchPlayer" },
+      { type: "animateStop" },
+    ];
+    dispatch({ type: "animate" });
     dispatch({ type: "move", payload: { position, color } });
     dispatch({
       type: "convert",
       payload: { pawnsToTurn: move.takes, color: color },
     });
     dispatch({ type: "switchPlayer" });
+    dispatch({ type: "animateStop" });
   };
+  //. JSX .
   return (
     <div className="boardContainer">
       <div className="board">

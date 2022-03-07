@@ -1,38 +1,39 @@
+import { CheatInspector } from "./CheatInspector";
 import React, { useEffect, useReducer, useState, useRef } from "react";
 import { reducer, initialState } from "../logic/state";
 import { isThereAnyLegalMoves } from "../logic/checks";
 import { makeAiPlay } from "../logic/ai";
 import { findScore } from "../logic/score";
 import { WhitePawn, BlackPawn } from "./Pawns";
+import Scoreboard from "./Scoreboard";
 import Board from "./Board";
+import TurnInfo from "./TurnInfo";
+import { colors } from "../logic/constants";
 
 //. Component .
 const Game = () => {
   //* STATE DEFINITION .
-  const [state, dispatch] = useReducer<React.Reducer<any, any>>(
-    reducer,
-    initialState
-  );
-  const [blackScore, setBlackScore] = useState(findScore(2, state.board));
-  const [whiteScore, setWhiteScore] = useState(findScore(1, state.board));
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [score, setScore] = useState({ black: 0, white: 0 });
   const [legalMoves, setLegalMoves] = useState<number[][]>([]);
   const [previousState, setPreviousState] = useState<number[][][]>([]);
   const [selectedState, setSelectedState] = useState(0);
-  const colors = [0, "White", "Black"];
 
   const prevBtn = useRef(null);
   const nextBtn = useRef(null);
+  const timeoutRef = useRef<number>();
+
   //. OBSERVING STATE .
   useEffect(() => {
     //* Early exit if the game is over or we're not playing
-    if (state.isGameOver || !state.isPlaying) return;
+    if (state.isGameOver || !state.isPlaying || state.animating) return;
+    //* Saving state of board before deciding the rest
     setPreviousState((old) => [...old, state.board]);
+    //*
     //* We measure the score :
     const blackScore = findScore(2, state.board);
-    setBlackScore(blackScore);
     const whiteScore = findScore(1, state.board);
-    setWhiteScore(whiteScore);
-
+    setScore({ black: blackScore, white: whiteScore });
     //* Checking if the player still has a legal move
     const legalReturn = isThereAnyLegalMoves(state.board, state.whosTurn);
     //* If not, we check if the opponent can still play
@@ -54,14 +55,18 @@ const Game = () => {
     } else {
       //* If there's still legal moves, we store them in the state
       setLegalMoves(legalReturn);
+      //* Then we check who's turn it is :
+      if (state.whosTurn === 2) {
+        document.querySelector(".boardContainer")?.classList.add("active");
+      } else {
+        document.querySelector(".boardContainer")?.classList.remove("active");
+        const timeoutId = setTimeout(() => {
+          makeAiPlay(dispatch, state.board, 1);
+        }, 1000);
+        timeoutRef.current = timeoutId;
+      }
     }
-    //* Then we check who's turn it is :
-    if (state.isPlaying && state.whosTurn === 2) {
-      document.querySelector(".boardContainer")?.classList.add("active");
-    } else {
-      document.querySelector(".boardContainer")?.classList.remove("active");
-      makeAiPlay(dispatch, state.board, 1);
-    }
+    return () => clearTimeout(timeoutRef.current);
   }, [state]);
 
   //. PUTTING AN EVENT LISTENER FOR keys
@@ -73,22 +78,22 @@ const Game = () => {
   };
   const handleClick = (e: MouseEvent) => {
     //@ts-ignore
-    if (e.target?.id === "leftBtn") goLeft();
+    if (e.target?.id === "leftBtn")
+      setSelectedState((old) => (old === 0 ? old : old - 1));
     //@ts-ignore
-    if (e.target?.id === "rightBtn") goRight();
+    if (e.target?.id === "rightBtn")
+      setSelectedState((old) =>
+        old === previousState.length - 1 ? old : old + 1
+      );
   };
   useEffect(() => {
+    console.log("mounted game");
     document.addEventListener("keydown", handleKeyPress);
-    return () => document.removeEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+      console.log("unmounted game");
+    };
   }, []);
-  const goLeft = () => {
-    setSelectedState((old) => (old === 0 ? old : old - 1));
-  };
-  const goRight = () => {
-    setSelectedState((old) =>
-      old === previousState.length - 1 ? old : old + 1
-    );
-  };
   //. RETURN STATEMENT .
   return (
     <div className="gameContainer">
@@ -113,80 +118,27 @@ const Game = () => {
           ) : null}
         </div>
         {/* GAME INFORMATION */}
-        <div className="gameInfo">
-          <p>{colors[state.whosTurn]}'s turn</p>
-        </div>
+        <TurnInfo whosTurn={colors[state.whosTurn] as string} />
         {/* ACTUAL BOARD */}
         <Board
           board={state.board}
           canPlay={state.isPlaying && state.whosTurn === 2}
           state={state}
           dispatch={dispatch}
-          winner={blackScore > whiteScore ? "Black" : "White"}
+          winner={score.black > score.white ? "Black" : "White"}
           legalMoves={legalMoves}
         />
       </div>
       {/* SCORE DISPLAY */}
-      <div className="scoreContainer">
-        <h2>Score</h2>
-        <div>Black : {blackScore} pawns</div>
-        <div>White : {whiteScore} pawns</div>
-      </div>
+      <Scoreboard score={score} />
       {/* CHEAT INSPECTOR CONTROLS */}
-      <div className="cheatInspector">
-        <h2>Cheat Inspector</h2>
-        {/* CHEAT INSPECTOR CONTROLS */}
-        <div className="prevSelector">
-          <div className="prevSelector__info">
-            Turn n°{selectedState}/
-            {previousState.length - 1 < 0 ? 0 : previousState.length - 1}
-          </div>
-          <div className="prevSelector__controls">
-            <span
-              //@ts-ignore
-              onClick={handleClick}
-              style={{ cursor: "pointer" }}
-              id={"leftBtn"}
-              ref={prevBtn}
-            >
-              {"<"}
-            </span>
-            <span
-              //@ts-ignore
-              onClick={handleClick}
-              style={{ cursor: "pointer" }}
-              id={"rightBtn"}
-              ref={nextBtn}
-            >
-              {">"}
-            </span>
-          </div>
-        </div>
-        {/* CHEAT INSPECTOR */}
-        <div className="prev">
-          {previousState.length > 0 &&
-            previousState[selectedState].map(
-              (line: number[], lineIndex: number) =>
-                line.map((cell: number, cellIndex: number) => {
-                  const pos = [lineIndex, cellIndex];
-                  return (
-                    <div
-                      key={"d" + pos.toString()}
-                      className={"cell"}
-                      id={pos.toString()}
-                    >
-                      {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
-                      {/* DEVELOPER HELP */}
-                      {/* <span
-                      className="tooltip"
-                      style={{ color: "black" }}
-                    >{`${lineIndex},${cellIndex}`}</span> */}
-                    </div>
-                  );
-                })
-            )}
-        </div>
-      </div>
+      <CheatInspector
+        previousState={previousState}
+        selectedState={selectedState}
+        handleClick={handleClick}
+        prevRef={prevBtn}
+        nextRef={nextBtn}
+      />
     </div>
   );
 };

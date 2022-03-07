@@ -10,7 +10,7 @@ const makeAiPlay = (
   const currentBoard = board;
   const moves = isThereAnyLegalMoves(currentBoard, color);
   if (!moves) return;
-
+  //* Make array of score per move .
   const calculations = moves.map((move) => {
     let totalScore;
     let takingScore; // 1-10
@@ -39,14 +39,17 @@ const makeAiPlay = (
     const distanceFromInline = move[1] < 7 - move[1] ? move[1] : 7 - move[1]; */
     return totalScore;
   });
+  //* Find the maximum score from the array .
   const maxCalculation = calculations.reduce(
     //@ts-ignore
     (acc, score) => (score > acc ? score : acc),
     0
   );
+  //* Define it's index
   const indexOfMax = calculations.indexOf(maxCalculation);
+  //* And finally, get the position from the max scoring move .
   const position = moves[indexOfMax];
-
+  dispatch({ type: "animate" });
   dispatch({ type: "move", payload: { position, color } });
   dispatch({
     type: "convert",
@@ -56,6 +59,7 @@ const makeAiPlay = (
     },
   });
   dispatch({ type: "switchPlayer" });
+  dispatch({ type: "animateStop" });
 };
 
 export { makeAiPlay };

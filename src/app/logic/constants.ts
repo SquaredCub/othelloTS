@@ -44,5 +44,6 @@ const target = [
   [7, 0],
   [7, 7],
 ];
+const colors = [0, "White", "Black"];
 
-export { vectors, avoid, target };
+export { vectors, avoid, target, colors };

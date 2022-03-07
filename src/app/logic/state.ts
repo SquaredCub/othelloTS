@@ -1,3 +1,4 @@
+import { colors } from "./constants";
 //* TYPES DEFINITION .
 interface ActionType {
   type: string;
@@ -12,6 +13,7 @@ export interface State {
   whosTurn: number;
   isGameOver: boolean;
   shouldRestart: boolean;
+  animating: boolean;
   board: number[][];
 }
 //* INITIAL STATE .
@@ -20,6 +22,7 @@ const initialState: State = {
   whosTurn: 2,
   isGameOver: false,
   shouldRestart: false,
+  animating: false,
   board: [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -34,6 +37,10 @@ const initialState: State = {
 //* REDUCER .
 const reducer = (state: State, action: ActionType) => {
   switch (action.type) {
+    case "animate":
+      return { ...state, animating: true };
+    case "animateStop":
+      return { ...state, animating: false };
     case "start":
       return { ...state, isPlaying: !state.isPlaying };
     case "gameOver":
@@ -41,6 +48,11 @@ const reducer = (state: State, action: ActionType) => {
     case "restart":
       return { ...initialState, isPlaying: true };
     case "switchPlayer":
+      console.log(
+        `${colors[state.whosTurn]}'s turn over. Switching to ${
+          state.whosTurn === 2 ? colors[1] : colors[2]
+        }`
+      );
       return { ...state, whosTurn: state.whosTurn === 2 ? 1 : 2 };
     case "move":
       const newBoard = state.board.map((line, lineIndex) =>
