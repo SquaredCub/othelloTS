@@ -1,14 +1,15 @@
 import { CheatInspector } from "./CheatInspector";
-import React, { useEffect, useReducer, useState, useRef } from "react";
+import { useEffect, useReducer, useState, useRef } from "react";
 import { reducer, initialState } from "../logic/state";
 import { isThereAnyLegalMoves } from "../logic/checks";
 import { makeAiPlay } from "../logic/ai";
 import { findScore } from "../logic/score";
-import { WhitePawn, BlackPawn } from "./Pawns";
 import Scoreboard from "./Scoreboard";
 import Board from "./Board";
 import TurnInfo from "./TurnInfo";
-import { colors } from "../logic/constants";
+import DispatchHandler from "./DispatchHandler";
+import { colors, AIDELAY } from "../logic/constants";
+import { ActionType } from "../logic/state";
 
 //. Component .
 const Game = () => {
@@ -18,11 +19,11 @@ const Game = () => {
   const [legalMoves, setLegalMoves] = useState<number[][]>([]);
   const [previousState, setPreviousState] = useState<number[][][]>([]);
   const [selectedState, setSelectedState] = useState(0);
-
+  const [moveIt, setMoveIt] = useState(false);
   const prevBtn = useRef(null);
   const nextBtn = useRef(null);
   const timeoutRef = useRef<number>();
-
+  const queueRef = useRef([]);
   //. OBSERVING STATE .
   useEffect(() => {
     //* Early exit if the game is over or we're not playing
@@ -46,7 +47,7 @@ const Game = () => {
         //* Otherwise we alert the player he can't play and that the opponent's turn will come instead
       } else {
         alert(
-          `Switching ${
+          `Skipping ${
             colors[state.whosTurn]
           }'s turn because he has no legal moves`
         );
@@ -61,12 +62,14 @@ const Game = () => {
       } else {
         document.querySelector(".boardContainer")?.classList.remove("active");
         const timeoutId = setTimeout(() => {
-          makeAiPlay(dispatch, state.board, 1);
-        }, 1000);
+          makeAiPlay(dispatch, state.board, 1, setMoveIt, queueRef);
+        }, AIDELAY);
         timeoutRef.current = timeoutId;
       }
     }
-    return () => clearTimeout(timeoutRef.current);
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
   }, [state]);
 
   //. PUTTING AN EVENT LISTENER FOR keys
@@ -127,6 +130,8 @@ const Game = () => {
           dispatch={dispatch}
           winner={score.black > score.white ? "Black" : "White"}
           legalMoves={legalMoves}
+          queue={queueRef}
+          setMoveIt={setMoveIt}
         />
       </div>
       {/* SCORE DISPLAY */}
@@ -139,6 +144,14 @@ const Game = () => {
         prevRef={prevBtn}
         nextRef={nextBtn}
       />
+      {moveIt && (
+        <DispatchHandler
+          queue={queueRef.current}
+          dispatch={dispatch}
+          setMoveIt={setMoveIt}
+          setLegalMoves={setLegalMoves}
+        />
+      )}
     </div>
   );
 };

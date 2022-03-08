@@ -5,7 +5,9 @@ import { avoid, target } from "./constants";
 const makeAiPlay = (
   dispatch: Dispatch<any>,
   board: number[][],
-  color: number
+  color: number,
+  setMoveIt: any,
+  queue: any
 ) => {
   const currentBoard = board;
   const moves = isThereAnyLegalMoves(currentBoard, color);
@@ -49,6 +51,22 @@ const makeAiPlay = (
   const indexOfMax = calculations.indexOf(maxCalculation);
   //* And finally, get the position from the max scoring move .
   const position = moves[indexOfMax];
+  const actions = [
+    { type: "animate" },
+    { type: "move", payload: { position, color } },
+    {
+      type: "convert",
+      payload: {
+        pawnsToTurn: moveOutput({ position, color, currentBoard }).takes,
+        color: color,
+      },
+    },
+    { type: "switchPlayer" },
+    { type: "animateStop" },
+  ];
+  queue.current = actions;
+  setMoveIt(true);
+  return;
   dispatch({ type: "animate" });
   dispatch({ type: "move", payload: { position, color } });
   dispatch({

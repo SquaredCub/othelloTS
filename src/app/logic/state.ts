@@ -1,13 +1,13 @@
 import { colors } from "./constants";
 //* TYPES DEFINITION .
-interface ActionType {
+type ActionType = {
   type: string;
   payload?: {
     position: number[];
     color: number;
     pawnsToTurn: number[][];
   };
-}
+};
 export interface State {
   isPlaying: boolean;
   whosTurn: number;
@@ -36,6 +36,7 @@ const initialState: State = {
 };
 //* REDUCER .
 const reducer = (state: State, action: ActionType) => {
+  if (!action) return state;
   switch (action.type) {
     case "animate":
       return { ...state, animating: true };
@@ -91,3 +92,4 @@ const reducer = (state: State, action: ActionType) => {
 };
 
 export { reducer, initialState };
+export type { ActionType };

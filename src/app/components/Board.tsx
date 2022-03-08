@@ -10,9 +10,19 @@ interface Props {
   dispatch: React.Dispatch<any>;
   winner: string;
   legalMoves: number[][];
+  queue: any;
+  setMoveIt: any;
 }
 //. Component .
-const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
+const Board = ({
+  board,
+  state,
+  dispatch,
+  winner,
+  legalMoves,
+  queue,
+  setMoveIt,
+}: Props) => {
   const handleCellClick = async (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
@@ -22,7 +32,18 @@ const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
     const currentBoard = state.board;
     //* Taking action :
     const move = moveOutput({ position, color, currentBoard });
-    if (!move.takes) return;
+    if (!move.takes || move.takes === true) return;
+    /* let converts;
+    if (move.takes.length > 0) {
+      converts = move.takes.map((pos: number[]) => {
+        return {
+          type: "convert",
+          payload: { pawnsToTurn: pos, color: color },
+        };
+      });
+    } else {
+      converts = move.takes[0];
+    } */
     const actions = [
       { type: "animate" },
       { type: "move", payload: { position, color } },
@@ -33,6 +54,9 @@ const Board = ({ board, state, dispatch, winner, legalMoves }: Props) => {
       { type: "switchPlayer" },
       { type: "animateStop" },
     ];
+    queue.current = actions;
+    setMoveIt(true);
+    return;
     dispatch({ type: "animate" });
     dispatch({ type: "move", payload: { position, color } });
     dispatch({

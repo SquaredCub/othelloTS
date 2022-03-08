@@ -45,5 +45,5 @@ const target = [
   [7, 7],
 ];
 const colors = [0, "White", "Black"];
-
-export { vectors, avoid, target, colors };
+const AIDELAY = 500;
+export { vectors, avoid, target, colors, AIDELAY };
