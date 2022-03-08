@@ -45,6 +45,6 @@ const target = [
   [7, 7],
 ];
 const colors = [0, "White", "Black"];
-const AI_DELAY = 500;
+const AI_DELAY = 0;
 const ANIMATION_TIME = 250;
 export { vectors, avoid, target, colors, AI_DELAY, ANIMATION_TIME };
