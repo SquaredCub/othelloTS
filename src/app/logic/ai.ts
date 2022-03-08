@@ -3,11 +3,9 @@ import { isThereAnyLegalMoves, moveOutput } from "./checks";
 import { avoid, target } from "./constants";
 
 const makeAiPlay = (
-  dispatch: Dispatch<any>,
   board: number[][],
   color: number,
-  setMoveIt: any,
-  queue: any
+  setQueue: React.Dispatch<React.SetStateAction<any[]>>
 ) => {
   const currentBoard = board;
   const moves = isThereAnyLegalMoves(currentBoard, color);
@@ -51,33 +49,23 @@ const makeAiPlay = (
   const indexOfMax = calculations.indexOf(maxCalculation);
   //* And finally, get the position from the max scoring move .
   const position = moves[indexOfMax];
+  const move = moveOutput({ position, color, currentBoard });
+  if (typeof move.takes === "boolean") return;
+  const converts = move.takes.map((pos) => {
+    return {
+      type: "convert",
+      payload: { pawnsToTurn: [pos], color },
+    };
+  });
   const actions = [
     { type: "animate" },
     { type: "move", payload: { position, color } },
-    {
-      type: "convert",
-      payload: {
-        pawnsToTurn: moveOutput({ position, color, currentBoard }).takes,
-        color: color,
-      },
-    },
+    ...converts,
+    { type: "eraseAnimation" },
     { type: "switchPlayer" },
     { type: "animateStop" },
   ];
-  queue.current = actions;
-  setMoveIt(true);
-  return;
-  dispatch({ type: "animate" });
-  dispatch({ type: "move", payload: { position, color } });
-  dispatch({
-    type: "convert",
-    payload: {
-      pawnsToTurn: moveOutput({ position, color, currentBoard }).takes,
-      color: color,
-    },
-  });
-  dispatch({ type: "switchPlayer" });
-  dispatch({ type: "animateStop" });
+  setQueue(actions);
 };
 
 export { makeAiPlay };

@@ -1,28 +1,18 @@
 import React from "react";
 import { State } from "../logic/state";
 import { moveOutput } from "../logic/checks";
-import { WhitePawn, BlackPawn } from "./Pawns";
+import { WhitePawn, BlackPawn, NewWhitePawn, NewBlackPawn } from "./Pawns";
 //. TYPES DEFINITION .
 interface Props {
   board: number[][];
   canPlay: boolean;
   state: State;
-  dispatch: React.Dispatch<any>;
   winner: string;
   legalMoves: number[][];
-  queue: any;
-  setMoveIt: any;
+  setQueue: any;
 }
 //. Component .
-const Board = ({
-  board,
-  state,
-  dispatch,
-  winner,
-  legalMoves,
-  queue,
-  setMoveIt,
-}: Props) => {
+const Board = ({ board, state, winner, legalMoves, setQueue }: Props) => {
   const handleCellClick = async (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     //* Defining arguments for checks .
@@ -33,38 +23,38 @@ const Board = ({
     //* Taking action :
     const move = moveOutput({ position, color, currentBoard });
     if (!move.takes || move.takes === true) return;
-    /* let converts;
-    if (move.takes.length > 0) {
-      converts = move.takes.map((pos: number[]) => {
-        return {
-          type: "convert",
-          payload: { pawnsToTurn: pos, color: color },
-        };
-      });
-    } else {
-      converts = move.takes[0];
-    } */
+    const converts = move.takes.map((pos) => {
+      return {
+        type: "convert",
+        payload: { pawnsToTurn: [pos], color },
+      };
+    });
     const actions = [
       { type: "animate" },
       { type: "move", payload: { position, color } },
-      {
-        type: "convert",
-        payload: { pawnsToTurn: move.takes, color: color },
-      },
+      ...converts,
+      { type: "eraseAnimation" },
       { type: "switchPlayer" },
       { type: "animateStop" },
     ];
-    queue.current = actions;
-    setMoveIt(true);
+    setQueue(actions);
     return;
-    dispatch({ type: "animate" });
-    dispatch({ type: "move", payload: { position, color } });
-    dispatch({
-      type: "convert",
-      payload: { pawnsToTurn: move.takes, color: color },
-    });
-    dispatch({ type: "switchPlayer" });
-    dispatch({ type: "animateStop" });
+  };
+  const renderCell = (cell: number) => {
+    switch (cell) {
+      case 0:
+        return null;
+      case 1:
+        return <WhitePawn />;
+      case 2:
+        return <BlackPawn />;
+      case 3:
+        return <NewWhitePawn />;
+      case 4:
+        return <NewBlackPawn />;
+      default:
+        return 0;
+    }
   };
   //. JSX .
   return (
@@ -87,7 +77,7 @@ const Board = ({
                 id={pos.toString()}
                 onClick={handleCellClick}
               >
-                {cell ? cell === 1 ? <WhitePawn /> : <BlackPawn /> : null}
+                {renderCell(cell)}
                 {/* DEVELOPER HELP */}
                 {/* <span
                   className="tooltip"

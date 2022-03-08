@@ -16,6 +16,19 @@ export interface State {
   animating: boolean;
   board: number[][];
 }
+/* 
+type Pawn = {
+  color: number;
+  status: string; // old, new, flipped
+  
+  old = do nothing
+  new = instant placing
+  flipped = from !color to color
+}
+*/
+const convert = (color: number) => {
+  return color === 2 ? 4 : 3;
+};
 //* INITIAL STATE .
 const initialState: State = {
   isPlaying: false,
@@ -79,13 +92,20 @@ const reducer = (state: State, action: ActionType) => {
               lineIndex === action.payload?.pawnsToTurn[x][0] &&
               cellIndex === action.payload?.pawnsToTurn[x][1]
             ) {
-              return action.payload.color;
+              return convert(action.payload.color);
             }
             return cell;
           });
         });
       }
       return { ...state, board: turnedBoard };
+    case "eraseAnimation":
+      let erasedBoard: number[][] = state.board.map((line, lineIndex) => {
+        return line.map((cell, cellIndex) => {
+          return cell === 3 ? 1 : cell === 4 ? 2 : cell;
+        });
+      });
+      return { ...state, board: erasedBoard };
     default:
       return state;
   }

@@ -7,9 +7,7 @@ import { findScore } from "../logic/score";
 import Scoreboard from "./Scoreboard";
 import Board from "./Board";
 import TurnInfo from "./TurnInfo";
-import DispatchHandler from "./DispatchHandler";
-import { colors, AIDELAY } from "../logic/constants";
-import { ActionType } from "../logic/state";
+import { colors, AI_DELAY } from "../logic/constants";
 
 //. Component .
 const Game = () => {
@@ -19,11 +17,11 @@ const Game = () => {
   const [legalMoves, setLegalMoves] = useState<number[][]>([]);
   const [previousState, setPreviousState] = useState<number[][][]>([]);
   const [selectedState, setSelectedState] = useState(0);
-  const [moveIt, setMoveIt] = useState(false);
+  const [queue, setQueue] = useState<any[]>([]);
+  const [intervalDone, setIntervalDone] = useState(true);
   const prevBtn = useRef(null);
   const nextBtn = useRef(null);
   const timeoutRef = useRef<number>();
-  const queueRef = useRef([]);
   //. OBSERVING STATE .
   useEffect(() => {
     //* Early exit if the game is over or we're not playing
@@ -62,8 +60,8 @@ const Game = () => {
       } else {
         document.querySelector(".boardContainer")?.classList.remove("active");
         const timeoutId = setTimeout(() => {
-          makeAiPlay(dispatch, state.board, 1, setMoveIt, queueRef);
-        }, AIDELAY);
+          makeAiPlay(state.board, 1, setQueue);
+        }, AI_DELAY);
         timeoutRef.current = timeoutId;
       }
     }
@@ -97,6 +95,18 @@ const Game = () => {
       console.log("unmounted game");
     };
   }, []);
+  //. Dispatch Queue Handler
+  useEffect(() => {
+    if (!queue || queue.length === 0) return;
+    const intervalId = setInterval(() => {
+      dispatch(queue[0]);
+      setQueue((queue) => queue.slice(1));
+    }, 250);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [queue]);
+
   //. RETURN STATEMENT .
   return (
     <div className="gameContainer">
@@ -127,11 +137,9 @@ const Game = () => {
           board={state.board}
           canPlay={state.isPlaying && state.whosTurn === 2}
           state={state}
-          dispatch={dispatch}
           winner={score.black > score.white ? "Black" : "White"}
           legalMoves={legalMoves}
-          queue={queueRef}
-          setMoveIt={setMoveIt}
+          setQueue={setQueue}
         />
       </div>
       {/* SCORE DISPLAY */}
@@ -144,14 +152,6 @@ const Game = () => {
         prevRef={prevBtn}
         nextRef={nextBtn}
       />
-      {moveIt && (
-        <DispatchHandler
-          queue={queueRef.current}
-          dispatch={dispatch}
-          setMoveIt={setMoveIt}
-          setLegalMoves={setLegalMoves}
-        />
-      )}
     </div>
   );
 };

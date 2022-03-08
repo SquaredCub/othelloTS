@@ -42,6 +42,10 @@ body {
   height: 80%;
   border-radius: 100%;
   pointer-events: none;
+  &.new {
+    animation-duration: 250ms;
+    animation-name: flip;
+  }
 }
 .bP {
   background-color: black;
@@ -53,4 +57,13 @@ ol {
   list-style-type: square;
   text-indent: 0.5rem;
   list-style-position: inside;
+}
+
+@keyframes flip {
+  from {
+    transform: scale(1.5);
+  }
+  to {
+    transform: scale(1);
+  }
 }
